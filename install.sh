@@ -28,7 +28,22 @@ if [ ! -f "$HOME/dotfiles/git/.gitconfig.local" ]; then
 	EOF
 fi
 
-brew install tmux fzf ripgrep fd lazygit bat stow neovim zsh-syntax-highlighting terraform
+brew install \
+	tmux \
+	fzf \
+	ripgrep \
+	fd \
+	lazygit \
+	bat \
+	stow \
+	neovim \
+	zsh-syntax-highlighting \
+	fastfetch \
+	golangci-lint \
+	shellcheck \
+	htop \
+	tldr \
+	tree
 
 if [[ $(uname) == "Linux" ]]; then
 	# in macos zsh is already preinstalled
@@ -37,7 +52,7 @@ if [[ $(uname) == "Linux" ]]; then
 	if ! grep -Fxq "$(brew --prefix)/bin/zsh" /etc/shells; then
 		echo "$(brew --prefix)/bin/zsh" | sudo tee -a /etc/shells
 	fi
-	chsh -s "$(brew --prefix)/bin/zsh"
+	sudo chsh -s "$(brew --prefix)/bin/zsh" $(whoami)
 	sudo ln -sf "$(brew --prefix)/bin/zsh" /bin/zsh
 	# wsl
 	if [ -n "$WSL_INTEROP" ]; then
@@ -66,16 +81,17 @@ if [[ $(uname) == "Linux" ]]; then
 	fi
 fi
 
-$(brew --prefix)/bin/stow -v 2 -d $HOME/dotfiles -t $HOME -S zsh tmux ripgrep git
+$(brew --prefix)/bin/stow -v 2 -d $HOME/dotfiles -t $HOME -S zsh tmux ripgrep git gpg scripts templates
 # distinguish between OS and separately apply the stow vscode config
 # set a different target directory for vscode config so dont try to set the whole
 # path just generalize it under a vscode folder and the target is then dependent on OS
 if [[ $(uname) == "Darwin" ]]; then
 	# rm -rf "$HOME/Library/Application Support/lazygit/config.yml"
 	$(brew --prefix)/bin/stow -v 2 -d $HOME/dotfiles -t "$HOME/Library/Application Support/lazygit" -S lazygit
+	$(brew --prefix)/bin/stow -v 2 -d $HOME/dotfiles -t "$HOME" -S folder-actions
 	$(brew --prefix)/bin/stow -v 2 -d $HOME/dotfiles -t "$HOME/Library/Application Support/Code/User" -S vscode
 	xargs -n 1 code --install-extension < $HOME/dotfiles/vscode/vscode-extensions.txt
 fi
 
-mkdir -p $HOME/dev
+mkdir -p $HOME/dev $HOME/hda $HOME/work
 touch $HOME/.zsh_history

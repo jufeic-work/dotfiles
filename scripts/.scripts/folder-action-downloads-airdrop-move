@@ -1,0 +1,28 @@
+#!/usr/bin/env bash
+
+# The script is executed as the user that triggered the configured Folder Action.
+# The Folder Action is defined in the home directory of a user.
+
+# The path to the file is passed
+file="$1"
+dst="$HOME/Library/Mobile Documents/com~apple~CloudDocs/airdrop"
+
+# If the file has no extended file attribute with this key, an error is printed
+quarantineValue="$(xattr -p com.apple.quarantine "$file" 2>/dev/null)" || exit 0
+
+# Extract the event identifier of the attribute value
+eventIdentifier="$(echo "$quarantineValue" | awk -F';' 'NR==1 {print $4}')"
+
+# Query the name of the agent for this event identifier from the quarantine database
+agentName="$(
+	sqlite3 "$HOME/Library/Preferences/com.apple.LaunchServices.QuarantineEventsV2" \
+	"select LSQuarantineAgentName
+	from LSQuarantineEvent
+	where LSQuarantineEventIdentifier='$eventIdentifier';"
+)"
+
+# If the agent is sharingd, the file was received via AirDrop
+if [[ "$agentName" == "sharingd" ]]; then
+	mkdir -p "$dst"
+	mv "$file" "$dst"
+fi

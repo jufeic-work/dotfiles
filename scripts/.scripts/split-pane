@@ -7,7 +7,7 @@ pane_command=$(tmux display-message -p "#{pane_current_command}")
 pane_path=$(tmux display-message -p "#{pane_current_path}")
 # we need to check this first as we cannot rely on checking the pane current command for
 # podman as it could be wrapped in a Makefile e.g. and then make is the pane current command
-container_command=$(ps -ww -o command -t "$pane_tty" | awk '$1=="podman" && ( $2=="run" || $2=="exec" )') || exit 0
+container_command=$(ps -ww -o command -t "$pane_tty" | awk '$1=="podman" && ( $2=="run" || $2=="exec" )' | tail -1) || exit 0
 
 if [[ "$pane_command" == "ssh" ]]; then
 	# Extract the full ssh command from the current pane's terminal

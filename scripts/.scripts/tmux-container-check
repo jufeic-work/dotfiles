@@ -1,0 +1,10 @@
+#!/usr/bin/env bash
+
+pane_tty=$(tmux display-message -p "#{pane_tty}")
+result=$(ps -ww -o command -t "$pane_tty" | awk '$1=="podman" && ( $2=="run" || $2=="exec" )')
+
+if [ -z "$result" ]; then
+	tmux set -g pane-active-border-style "#{?#{==:#{pane_current_command},ssh},fg=yellow,fg=blue}"
+else
+	tmux set -g pane-active-border-style "#{?#{==:#{pane_current_command},ssh},fg=yellow,fg=green}"
+fi

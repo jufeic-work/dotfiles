@@ -29,6 +29,9 @@ case "$project_type" in
 	c)
 		create-project-windows $session_name $new_proj "${new_proj}/main.c" "3"
 	  ;;
+	bash)
+		create-project-windows $session_name $new_proj "${new_proj}/script" "1"
+	  ;;
 *)
 	exit 0
 	;;

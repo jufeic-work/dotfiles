@@ -24,15 +24,26 @@ setopt PROMPT_SUBST
 set -o pipefail
 export FZF_DEFAULT_OPTS="--exact"
 if [[ $TERM_PROGRAM == "tmux" ]]; then
-  export FZF_CTRL_R_OPTS="--tmux"
+	export FZF_CTRL_R_OPTS="--tmux=60% --color='bg:#292C34'"
 fi
 # old: solarized
 export BAT_THEME="TwoDark"
 export RG_DIRS="$HOME/dotfiles $HOME/hda $HOME/dev"
+# use nvim as the pager for the 'man' command instead of less
+# q works to exit like in less
+export MANPAGER='nvim +Man!'
+# export MANPAGER='bat -lman -pp'
+# export MANPAGER="sh -c 'sed -u -e \"s/\\x1B\[[0-9;]*m//g; s/.\\x08//g\" | bat -p -lman'"
+# enable syntax highlighting for help page of commands
+alias -g -- -h='-h 2>&1 | bat --language=help --style=plain'
+alias -g -- --help='--help 2>&1 | bat --language=help --style=plain'
+
+export LIMA_INSTANCE="bpf"
+export LIMA_WORKDIR="/home/julius"
 
 # history
 export HISTFILE=$HOME/.zsh_history
-export HISTSIZE=100000
+export HISTSIZE=200000
 export SAVEHIST=$HISTSIZE
 
 setopt HIST_IGNORE_ALL_DUPS
@@ -41,8 +52,15 @@ setopt HIST_FIND_NO_DUPS
 setopt HIST_SAVE_NO_DUPS
 setopt HIST_EXPIRE_DUPS_FIRST
 setopt INC_APPEND_HISTORY
+# if a line has no trailing newline char like with echo -n 'something' and PROMPT_SP
+# is not disabled, zsh will print a % or # instead of the missing newline char
 # to avoid the % char e.g. if tmux sends keys before completely loaded
-unsetopt PROMPT_SP
+# but it is recommended not to disable PROMPT_SP or PROMPT_CR as it can cause
+# disappearing of lines without trailing newline
+# unsetopt PROMPT_SP
+# the default % or # can be changed by setting this shell parameter
+# PROMPT_EOL_MARK=''
+# PROMPT_EOL_MARK='%K{red} '
 # to avoid the beep sound in the terminal
 unsetopt BEEP
 
@@ -54,22 +72,34 @@ fpath+=$ZSH/completion
 source $ZSH/themes/jjcol.zsh-theme
 
 # Preferred editor for local and remote sessions
-export EDITOR='vi'
+export EDITOR='nvim'
 
 # aliases
+alias v=nvim
 alias k=kubectl
 alias docker=podman
 alias lg=lazygit
 alias vi=nvim
 alias vim=nvim
-alias ll='ls -lahF --color'
+# probably the --color only on Linux?
+alias ll='ls -lAhFG --color'
 alias rm='rm -I'
+alias ghrf='gh repo fork --clone --default-branch-only'
 alias ..='cd ..'
 alias ...='cd ../..'
 alias ....='cd ../../..'
 alias .....='cd ../../../..'
 -() {
   cd -
+}
+
+podman() {
+	if [ "$1" = "run" ]; then
+		shift
+		command podman run --cidfile="$(pwd)"/.cid-"$(basename $(tmux display-message -p '#{pane_tty}'))" "$@"
+	else
+		command podman "$@"
+	fi
 }
 
 # load this module to be able to bind keys for selecting stuff from completion menu
@@ -82,13 +112,17 @@ bindkey -M menuselect 'j' vi-down-line-or-history
 bindkey -M menuselect 'k' vi-up-line-or-history
 bindkey -M menuselect 'l' vi-forward-char
 
+# bindkey -M vicmd -r 's'
 # surrounding functionality
 autoload -Uz surround
 zle -N delete-surround surround
 zle -N add-surround surround
 zle -N change-surround surround
-bindkey -M vicmd cs change-surround
-bindkey -M vicmd ds delete-surround
+bindkey -a cs change-surround
+bindkey -a ds delete-surround
+# bindkey -a ys add-surround
+# bindkey -M vicmd cs change-surround
+# bindkey -M vicmd ds delete-surround
 bindkey -M vicmd ys add-surround
 bindkey -M visual S add-surround
 
@@ -132,42 +166,13 @@ cursor_mode() {
 cursor_mode
 
 vi-yank-clipboard() {
-  zle vi-yank
-  echo -n "$CUTBUFFER" | $CLIPBOARD
-	# Save the current buffer (command) and the current prefix
-	local prefix="❯ "
-  local command="$BUFFER"
-
-  # Clear the current line
-  echo -ne "\033[2K\r"
-
-  # Reprint the prefix without highlighting
-  echo -ne "$prefix"
-
-  # Highlight the command text
-  echo -ne "\033[43m$command\033[0m"
-
-  current_window_name=$(tmux display-message -p '#W')
-	tmux setw automatic-rename off
-	# we must use the disabling of automatic renaming of the title
-	# in the tmux status line before renaming the window since otherwise
-	# this command itself (tmux rename-window) would already trigger a
-	# renaming (if we would have tried to just rename the window directly
-	# after sleep)
-	tmux rename-window "$current_window_name"
-  # Wait for 200ms
-  sleep 0.1
-
-  # Redraw the original line (prefix and command without highlight)
-  echo -ne "\033[2K\r$prefix$command"
-
-  # Restore the zle prompt
-  zle reset-prompt
-
-	tmux setw automatic-rename on
+	zle vi-yank
+	echo -n "$CUTBUFFER" | $CLIPBOARD
 }
 
 zle -N vi-yank-clipboard
+# yy still only yanks the current line; so for multiline commands one has to
+# press V, highlight everything and press y
 bindkey -M vicmd 'y' vi-yank-clipboard
 
 # this function is to open playground main file in go to try out things very quick
@@ -180,13 +185,12 @@ test-go() {
 
 path=("$HOME/.scripts" $path)
 
-if [ -f ~/.secrets ]; then
-	source ~/.secrets
-fi
+[ -f ~/.secrets ] && source ~/.secrets
 
-if [[ $TERM_PROGRAM != "vscode" ]]; then
+if [[ -z "$NO_TMUX" && $TERM_PROGRAM != "vscode" ]]; then
 	if command -v tmux &> /dev/null && ( ! tmux info &> /dev/null || [ -z "$TMUX" ] ); then
-		tmux attach -t dev || tmux new -s dev
+		tmux attach &>/dev/null || tmux new -s '~/dev' -c "$HOME/dev"
+		# tmux attach -t '~/dev' || tmux new -s '~/dev' -c "$HOME/dev"
 	fi
 fi
 
@@ -198,7 +202,7 @@ zstyle ':completion:*' menu select
 # also consider dotfiles when doing e.g. vi <Tab>
 _comp_options+=(globdots)
 
-# Set up fzf key bindings and fuzzy completion
+# Set up fzf key bindings like <C-r> and fuzzy completion
 source <(fzf --zsh)
 
 if command -v kind &> /dev/null; then
@@ -221,6 +225,48 @@ path=(/usr/local/go/bin $path)
 if command -v go &> /dev/null; then
 	path=("$(go env GOPATH)/bin" $path)
 fi
+path=($path /usr/local/texlive/2024/bin/universal-darwin)
+
+
+# switch to any directory in the specified locations
+sd() {
+	NEW_DIR=$(
+		fd \
+			--type d \
+			-d 5 \
+			--search-path=$HOME/dotfiles \
+			--search-path=$HOME/dev \
+			--search-path=$HOME/hda | \
+		fzf \
+			--reverse \
+			--tmux 80% \
+			--keep-right \
+			--color='bg:#292C34' \
+			--preview-window=55% \
+			--preview 'ls -lAhF --color {}' \
+	) || return 0
+	cd $NEW_DIR
+}
+
+# switch to some subdirectory of the current directory
+sdl() {
+	NEW_DIR=$(
+		fd \
+			--type d \
+			-d 8 | \
+		fzf \
+			--reverse \
+			--tmux 80% \
+			--keep-right \
+			--color='bg:#292C34' \
+			--preview-window=55% \
+			--preview 'ls -lAhF --color {}' \
+	) || return 0
+	cd $NEW_DIR
+}
+
+# enable tab completion for shell aliases
+zstyle ':completion:*' completer _expand_alias _complete _ignored
 
 # zsh plugins
 # the highlighting need to be sourced at the VERY end of .zshrc

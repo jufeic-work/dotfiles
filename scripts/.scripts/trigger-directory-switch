@@ -1,0 +1,12 @@
+#!/usr/bin/env bash
+
+PANE_ID=$(tmux display -p "#D")
+PANE_CURRENT_COMMAND=$(tmux display -p "#{pane_current_command}")
+
+if [ "$PANE_CURRENT_COMMAND" == "zsh" ]; then
+	tmux send-keys -t "$PANE_ID" C-c
+	tmux send-keys -t "$PANE_ID" C-l
+	tmux send-keys -t "$PANE_ID" "sd" C-m
+else
+	exit 1
+fi

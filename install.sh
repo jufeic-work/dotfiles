@@ -15,6 +15,10 @@ else
 	echo "Homebrew already installed"
 fi
 
+# Execute the commands printed by the 'shellenv' command using eval to prepare the
+# shell environment in this script to use the brew command directly. To
+# execute the 'shellenv' command, the full path to the binary has to be provided
+# since the shell environment does not know brew until now.
 if [[ $(uname) == "Darwin" ]]; then
 	eval "$(/opt/homebrew/bin/brew shellenv)"
 else
@@ -28,22 +32,7 @@ if [ ! -f "$HOME/dotfiles/git/.gitconfig.local" ]; then
 	EOF
 fi
 
-brew install \
-	tmux \
-	fzf \
-	ripgrep \
-	fd \
-	lazygit \
-	bat \
-	stow \
-	neovim \
-	zsh-syntax-highlighting \
-	fastfetch \
-	golangci-lint \
-	shellcheck \
-	htop \
-	tldr \
-	tree
+brew bundle install --file="./brew/Brewfile"
 
 if [[ $(uname) == "Linux" ]]; then
 	# in macos zsh is already preinstalled

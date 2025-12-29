@@ -5,10 +5,11 @@
 
 # The path to the file is passed
 file="$1"
+timestamp="$2"
 dst="$HOME/Library/Mobile Documents/com~apple~CloudDocs/airdrop"
 
 # If the file has no extended file attribute with this key, an error is printed
-quarantineValue="$(xattr -p com.apple.quarantine "$file" 2>/dev/null)" || exit 0
+quarantineValue="$(xattr -p com.apple.quarantine "$file" 2>/dev/null)" || exit 1
 
 # Extract the event identifier of the attribute value
 eventIdentifier="$(echo "$quarantineValue" | awk -F';' 'NR==1 {print $4}')"
@@ -24,5 +25,20 @@ agentName="$(
 # If the agent is sharingd, the file was received via AirDrop
 if [[ "$agentName" == "sharingd" ]]; then
 	mkdir -p "$dst"
-	mv "$file" "$dst"
+	base="$(basename -- "$file")"
+	name="${base%.*}"
+	ext="${base##*.}"
+
+	# using the timestamp method to prevent overwriting existing files (default of mv).
+	# mv --backup is only available on Linux.
+	# mv -n does not overwrite an existing file.
+	# mv -i asks interactively to override (default no).
+	# 'echo n | mv -i <src> <dst>' can read from stdin instead of interactive prompt.
+	if [[ "$base" == "$ext" ]]; then
+		mv -- "$file" "$dst/$base-air-$timestamp"
+	else
+		mv -- "$file" "$dst/$name-air-$timestamp.$ext"
+	fi
+else
+	exit 1
 fi

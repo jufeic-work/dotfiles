@@ -41,6 +41,11 @@ vim.opt.mouse = "a"
 -- Don't show the mode, since it's already in the status line
 vim.opt.showmode = false
 
+-- The command line area (below the status line) is used to display number
+-- of visually selected characters or partial key sequences when typing.
+-- Disable it.
+vim.opt.showcmd = false
+
 -- Sync clipboard between OS and Neovim.
 --  Remove this option if you want your OS clipboard to remain independent.
 --  See `:help 'clipboard'`
@@ -80,16 +85,18 @@ vim.opt.listchars = { tab = "» ", trail = "·", nbsp = "␣" }
 vim.opt.inccommand = "split"
 
 -- Show which line your cursor is on
---vim.opt.cursorline = true
+vim.opt.cursorline = true
 
 -- Minimal number of screen lines to keep above and below the cursor.
 vim.opt.scrolloff = 13
 
--- level of indentation
-vim.opt.shiftwidth = 2
--- if true, use spaces to represent a \t
+-- level of indentation -> how many columns are added/removed when indenting with << or >>
+-- does not distinguish between tabs and spaces
+-- check with ":set shiftwidth?"
+vim.opt.shiftwidth = 4
+-- if true, insert spaces to represent a \t
 vim.opt.expandtab = false
--- how many spaces to visually represent a \t (2 or 4)
+-- how many columns / spaces to visually represent a \t (2 or 4)
 vim.opt.tabstop = 4
 
 -- [[ Basic Keymaps ]]
@@ -102,6 +109,7 @@ vim.keymap.set("v", "K", ":m '<-2<CR>gv=gv")
 vim.keymap.set("n", "[<space>", "o<Esc>k")
 vim.keymap.set("n", "]<space>", "O<Esc>j")
 
+-- Avoid misclick on Shift+q
 vim.keymap.set("n", "Q", "<nop>")
 -- vim.keymap.set("i", "<Tab>", "<Esc>")
 -- vim.keymap.set("i", "ttt", "<Tab>")
@@ -120,7 +128,7 @@ vim.keymap.set("x", "<leader>p", [["_dP]])
 -- insert empty line above cursor when pasting a function under the current position
 vim.api.nvim_set_keymap(
 	"n",
-	"fp",
+	"<leader>pf",
 	'p:lua vim.api.nvim_buf_set_lines(0, vim.fn.line(".")-1, vim.fn.line(".")-1, false, {""})<CR>',
 	{ noremap = true, silent = true }
 )
@@ -198,7 +206,7 @@ vim.opt.rtp:prepend(lazypath)
 -- NOTE: Here is where you install your plugins.
 require("lazy").setup({
 	-- NOTE: Plugins can be added with a link (or for a github repo: 'owner/repo' link).
-	"tpope/vim-sleuth", -- Detect tabstop and shiftwidth automatically
+	-- "tpope/vim-sleuth", -- Detect tabstop and shiftwidth automatically
 
 	-- NOTE: Plugins can also be added by using a table,
 	-- with the first argument being the link and the following
@@ -1050,3 +1058,15 @@ vim.cmd([[colorscheme kanagawa-dragon]])
 -- vim.cmd([[colorscheme gruvbox]])
 -- The line beneath this is called `modeline`. See `:help modeline`
 -- vim: ts=2 sts=2 sw=2 et
+vim.api.nvim_set_hl(0, "Visual", {
+	bg = "#FFD884",
+})
+-- Only visible if: vim.opt.cursorline = true
+vim.api.nvim_set_hl(0, "CursorLineNr", {
+	fg = "#FFD884",
+	bold = true,
+})
+-- vim.api.nvim_set_hl(0, "LineNr", {
+-- 	fg = "#FFD884",
+-- 	bold = true,
+-- })

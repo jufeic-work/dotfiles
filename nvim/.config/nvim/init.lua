@@ -170,6 +170,21 @@ vim.keymap.set("n", "<C-k>", "<C-w><C-k>", { desc = "Move focus to the upper win
 
 vim.opt.colorcolumn = "80"
 
+-- Write the last messages of output in command area in a buffer to be able
+-- to navigate and copy the output
+-- options:
+-- buftype: not associated with file
+-- bufhidden: destroy buffer when hidden or closed with :q
+-- readonly
+-- no swap file
+vim.api.nvim_create_user_command("Msg", function()
+	vim.cmd([[
+    new
+    put =execute('messages')
+    setlocal buftype=nofile bufhidden=wipe nobuflisted noswapfile readonly
+  ]])
+end, {})
+
 -- [[ Basic Autocommands ]]
 --  See `:help lua-guide-autocommands`
 

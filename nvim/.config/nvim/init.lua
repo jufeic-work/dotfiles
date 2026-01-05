@@ -1014,20 +1014,87 @@ require("lazy").setup({
 			vim.keymap.set("x", "S", [[:<C-u>lua MiniSurround.add('visual')<CR>]], { silent = true })
 			require("mini.pairs").setup()
 
-			-- Simple and easy statusline.
-			--  You could remove this setup call if you don't like it,
-			--  and try some other statusline plugin
+			-- https://nvim-mini.org/mini.nvim/doc/mini-statusline.html
+			-- alternative: https://github.com/nvim-lualine/lualine.nvim
 			local statusline = require("mini.statusline")
-			-- set use_icons to true if you have a Nerd Font
-			statusline.setup({ use_icons = vim.g.have_nerd_font })
 
 			-- You can configure sections in the statusline by overriding their
 			-- default behavior. For example, here we set the section for
 			-- cursor location to LINE:COLUMN
 			---@diagnostic disable-next-line: duplicate-set-field
+			-- statusline.section_location = function()
+			-- 	-- return "%2l:%-2v"
+			-- 	-- %l : current line number
+			-- 	-- %L : total number of lines
+			-- 	-- %v : virtual column number
+			-- 	return " %l/%L:%-2v"
+			-- end
 			statusline.section_location = function()
-				return "%2l:%-2v"
+				local l = vim.fn.line(".")
+				local L = vim.fn.line("$")
+				local v = vim.fn.virtcol(".")
+
+				local w = tostring(L):len() -- width of total lines
+				local cur = string.format("%" .. w .. "d", l)
+
+				return cur .. "/" .. L .. ":" .. v
 			end
+
+			-- If showcmd option is set, the number of selected chars is displayed
+			-- in the command area.
+			-- Also you can select stuff and type "g<C-g>" and get the output below:
+			-- Selected 1 of 1194 Lines; 1 of 6375 Words; 24 of 46278 Chars; 24 of 46321 Bytes
+			-- But to make it more convenient and display those statistics so that they
+			-- are always visible in visual mode in the status line:
+			local function section_visual_stats()
+				local mode = vim.fn.mode()
+				-- v = charwise, V = linewise, ^V = blockwise (shown as "\22")
+				if not (mode == "v" or mode == "V" or mode == "\22") then
+					return ""
+				end
+
+				-- Lines in selection (works for v/V; for block it's still line span)
+				local l1 = vim.fn.line("v")
+				local l2 = vim.fn.line(".")
+				local lines = math.abs(l2 - l1) + 1
+
+				-- wordcount() includes selection keys in Visual mode
+				local wc = vim.fn.wordcount()
+				local words = wc.visual_words or 0
+				local chars = wc.visual_chars or 0
+
+				return string.format("%dL %dW %dC", lines, words, chars)
+			end
+
+			-- as seen in the default config, the setup can be overriden
+			statusline.setup({
+				use_icons = vim.g.have_nerd_font,
+				content = {
+					active = function()
+						local mode, mode_hl = MiniStatusline.section_mode({ trunc_width = 120 })
+						local git = MiniStatusline.section_git({ trunc_width = 40 })
+						local diff = MiniStatusline.section_diff({ trunc_width = 75 })
+						-- local diagnostics = MiniStatusline.section_diagnostics({ trunc_width = 75 })
+						-- local lsp = MiniStatusline.section_lsp({ trunc_width = 75 })
+						local filename = MiniStatusline.section_filename({ trunc_width = 140 })
+						local fileinfo = MiniStatusline.section_fileinfo({ trunc_width = 120 })
+						local location = MiniStatusline.section_location({ trunc_width = 75 })
+						local search = MiniStatusline.section_searchcount({ trunc_width = 75 })
+						local vstats = section_visual_stats()
+
+						return MiniStatusline.combine_groups({
+							{ hl = mode_hl, strings = { mode } },
+							{ hl = "MiniStatuslineDevinfo", strings = { git, diff } },
+							"%<",
+							{ hl = "MiniStatuslineFilename", strings = { filename } },
+							"%=",
+							{ hl = "MiniStatuslineFileinfo", strings = { fileinfo } },
+							-- Put visual stats near the right side, next to search/location
+							{ hl = mode_hl, strings = { vstats, search, location } },
+						})
+					end,
+				},
+			})
 
 			-- ... and there is more!
 			--  Check out: https://github.com/echasnovski/mini.nvim

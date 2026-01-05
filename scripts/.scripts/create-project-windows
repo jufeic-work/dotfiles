@@ -19,4 +19,4 @@ else
 fi
 tmux split-window -h -d -t "${session_name}:2" -c "$dir"
 tmux send-keys -t "${session_name}:2.2" C-l
-tmux resize-pane -t "${session_name}:2.2" -R 30
+tmux resize-pane -t "${session_name}:2.2" -R 40

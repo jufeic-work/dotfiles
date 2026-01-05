@@ -62,7 +62,26 @@ vim.opt.ignorecase = true
 vim.opt.smartcase = true
 
 -- Keep signcolumn on by default
-vim.opt.signcolumn = "yes"
+-- vim.opt.signcolumn = "yes"
+vim.opt.signcolumn = "yes:2"
+-- vim.opt.numberwidth = 4
+-- vim.opt.foldcolumn = "9"
+
+local text_width = 100
+
+vim.api.nvim_create_autocmd({ "VimResized", "WinResized", "BufEnter" }, {
+	callback = function()
+		local columns = vim.o.columns
+		local winwidth = vim.api.nvim_win_get_width(0)
+
+		if winwidth > text_width + 20 then
+			local pad = math.floor((columns - text_width) / 2) - 3
+			vim.o.statuscolumn = string.rep(" ", pad) .. "%s %=%l "
+		else
+			vim.o.statuscolumn = "  %s %=%l"
+		end
+	end,
+})
 
 -- Decrease update time
 vim.opt.updatetime = 250

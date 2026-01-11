@@ -1,3 +1,4 @@
+# CLI tools
 brew "tmux"
 brew "fzf"
 brew "ripgrep"
@@ -17,3 +18,10 @@ brew "cmatrix"
 brew "hadolint"
 brew "lima"
 brew "gh"
+
+# Fonts
+cask "font-jetbrains-mono-nerd-font"
+cask "font-meslo-lg-nerd-font"
+
+# GUI applications
+cask "raycast"

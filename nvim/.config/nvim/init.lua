@@ -5,7 +5,7 @@ vim.g.mapleader = " "
 vim.g.maplocalleader = " "
 
 -- Set to true if you have a Nerd Font installed and selected in the terminal
-vim.g.have_nerd_font = false
+vim.g.have_nerd_font = true
 
 -- This is actually to make J functionality (join lines) an operator so it can be used e.g.
 -- like Jip
@@ -288,6 +288,11 @@ require("lazy").setup({
 		---@module 'oil'
 		---@type oil.SetupOpts
 		opts = {
+			columns = {
+				"icon",
+				"size",
+			},
+			-- icons = { provider = "mini" },
 			view_options = {
 				show_hidden = true,
 				is_hidden_file = function(name, bufnr)
@@ -301,7 +306,7 @@ require("lazy").setup({
 			},
 		},
 		-- Optional dependencies
-		dependencies = { { "echasnovski/mini.icons", opts = {} } },
+		-- dependencies = { { "nvim-mini/mini.icons", opts = {} } },
 		-- dependencies = { "nvim-tree/nvim-web-devicons" }, -- use if you prefer nvim-web-devicons
 		-- Lazy loading is not recommended because it is very tricky to make it work correctly in all situations.
 		lazy = false,
@@ -519,7 +524,7 @@ require("lazy").setup({
 		"ibhagwan/fzf-lua",
 		-- event = "VimEnter",
 		-- dependencies = {
-		-- 	{ "nvim-tree/nvim-web-devicons", enabled = vim.g.have_nerd_font },
+		-- 	{ "nvim-mini/mini.icons" },
 		-- },
 		opts = {
 			-- Keep defaults, but you can tweak behavior here
@@ -983,6 +988,7 @@ require("lazy").setup({
 	},
 
 	{ -- Collection of various small independent plugins/modules
+		-- https://github.com/echasnovski/mini.nvim
 		"echasnovski/mini.nvim",
 		config = function()
 			-- Better Around/Inside textobjects
@@ -1096,8 +1102,29 @@ require("lazy").setup({
 				},
 			})
 
-			-- ... and there is more!
-			--  Check out: https://github.com/echasnovski/mini.nvim
+			-- Copy UTF code of an icon from https://www.nerdfonts.com/cheat-sheet
+			-- Installed and activated Nerd Font required:
+			-- iTerm2 > Settings > Profiles > Text > "Use a different font for non-ASCII text"
+			-- > "MesloLGL Nerd Font Mono" in 18 or "JetBrainsMono Nerd Font Mono" in 18
+			require("mini.icons").setup({
+				style = "glyph",
+				-- specific mapping for special files
+				-- file = {
+				-- ["init.lua"] = { glyph = "󰈙" },
+				-- ["README.md"] = { glyph = "󰈙" },
+				-- },
+				-- specific mapping for files with a certain extension
+				-- extension = {
+				-- sh = { glyph = "󰈙" },
+				-- lua = { glyph = "󰈙" },
+				-- md = { glyph = "󰈙" },
+				-- },
+				-- specific mapping for files of a certain type
+				-- :set filetype?
+				filetype = {
+					sh = { glyph = "\u{f489}" },
+				},
+			})
 		end,
 	},
 	{ -- Highlight, edit, and navigate code

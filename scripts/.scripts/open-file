@@ -47,7 +47,7 @@ if [ $is_git_repo -eq 0 ]; then
 fi
 
 session_name="~${dir#"$HOME"}"
-code $dir -g "${file}:${line}"
+# code $dir -g "${file}:${line}"
 
 if ! tmux has-session -t "$session_name" 2> /dev/null; then
 	create-project-windows $session_name $dir $file $line

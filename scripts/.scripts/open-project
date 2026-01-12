@@ -2,11 +2,11 @@
 
 project=$(
 	fd \
-		--glob ".git" ~/dotfiles ~/dev ~/hda \
+		--glob ".git" ~/dotfiles ~/dev ~/hda ~/work \
 		--type d \
 		--hidden \
 		--no-ignore \
-		2>/dev/null | \
+		2> /dev/null | \
 	xargs dirname | \
 	fzf \
 		--tmux 80% \

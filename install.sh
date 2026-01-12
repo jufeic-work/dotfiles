@@ -1,16 +1,37 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
-cd $HOME
-if [ ! -d $HOME/dotfiles ]; then
+# TODO: Alternative would be to just use the correct branch already in the
+# install script.
+# install.sh - Install script for dotfiles
+#
+# Usage:
+	# ./install.sh [system]
+#
+# Arguments:
+	# system: macos|linux|linux-headless|wsl
+		# Optional. Target system to install. If omitted, macOS is assumed
+		# but all others are pulled too.
+
+DOTFILES_URL="https://github.com/jufeic/dotfiles.git"
+
+cd "$HOME"
+if [[ ! -d "$HOME/dotfiles" ]]; then
 	echo "Cloning dotfiles"
-	git clone https://github.com/jufeic/dotfiles.git
+	if [[ -n "$1" ]]; then
+		git clone -b "$1" --single-branch "$DOTFILES_URL" || {
+			echo "System '$1' not supported" >&2
+			exit 1
+		}
+	else
+		git clone "$DOTFILES_URL"
+	fi
 else
 	echo "Dotfiles already cloned"
 fi
 
 if ! command -v brew &> /dev/null; then
-	echo "Install homebrew"
-	/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+	echo "Installing Homebrew"
+	bash <(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)
 else
 	echo "Homebrew already installed"
 fi

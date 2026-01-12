@@ -1,21 +1,7 @@
 # User configuration
-export KERNEL=$(uname)
-if [[ $KERNEL == "Darwin" ]]; then
-  # macos
-  export CLIPBOARD="pbcopy"
-  eval "$(/opt/homebrew/bin/brew shellenv)"
-else
-  # linux
-  if [ -n "$WSL_INTEROP" ]; then
-    # wsl
-    export CLIPBOARD="clip.exe"
-		alias open="powershell.exe start explorer.exe"
-  else
-    # no wsl
-    export CLIPBOARD="xclip -selection clipboard"
-  fi
-  eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"
-fi
+export CLIPBOARD="clip.exe"
+alias open="powershell.exe start explorer.exe"
+eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"
 
 # avoid duplicates on path
 typeset -U path
@@ -37,9 +23,6 @@ export MANPAGER='nvim +Man!'
 # enable syntax highlighting for help page of commands
 alias -g -- -h='-h 2>&1 | bat --language=help --style=plain'
 alias -g -- --help='--help 2>&1 | bat --language=help --style=plain'
-
-export LIMA_INSTANCE="bpf"
-export LIMA_WORKDIR="/home/julius"
 
 # history
 export HISTFILE=$HOME/.zsh_history
@@ -82,7 +65,7 @@ alias k=kubectl
 alias docker=podman
 alias lg=lazygit
 alias week='date +%V'
-alias ll='ls -lAhFG --color'
+alias ll='ls -lAhFG --color --group-directories-first'
 alias rm='rm -I'
 alias ghrf='gh repo fork --clone --default-branch-only'
 alias ..='cd ..'
@@ -224,8 +207,6 @@ path=(/usr/local/go/bin $path)
 if command -v go &> /dev/null; then
 	path=("$(go env GOPATH)/bin" $path)
 fi
-path=($path /usr/local/texlive/2024/bin/universal-darwin)
-
 
 bd () {
   (($#<1)) && {

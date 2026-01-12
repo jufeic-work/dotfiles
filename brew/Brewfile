@@ -1,4 +1,7 @@
 # CLI tools
+# in macOS, zsh is already preinstalled, in a Linux distro not necessarily.
+# Therefore use brew to install zsh.
+brew "zsh"
 brew "tmux"
 brew "fzf"
 brew "ripgrep"
@@ -16,7 +19,6 @@ brew "tldr"
 brew "tree"
 brew "cmatrix"
 brew "hadolint"
-brew "lima"
 brew "gh"
 
 # Fonts
@@ -24,4 +26,4 @@ cask "font-jetbrains-mono-nerd-font"
 cask "font-meslo-lg-nerd-font"
 
 # GUI applications
-cask "raycast"
+# No GUI under WSL

@@ -82,7 +82,6 @@ alias k=kubectl
 alias docker=podman
 alias lg=lazygit
 alias week='date +%V'
-# probably the --color only on Linux?
 alias ll='ls -lAhFG --color'
 alias rm='rm -I'
 alias ghrf='gh repo fork --clone --default-branch-only'
@@ -219,11 +218,8 @@ if command -v podman &> /dev/null; then
 	source <(podman completion zsh)
 fi
 
-# thats what terraform adds to the zshrc when adding terraform autocompletion
-autoload -U +X bashcompinit && bashcompinit
-complete -o nospace -C $(brew --prefix)/bin/terraform terraform
-
 path=($path /opt/homebrew/opt/node@20/bin)
+
 path=(/usr/local/go/bin $path)
 if command -v go &> /dev/null; then
 	path=("$(go env GOPATH)/bin" $path)
@@ -347,6 +343,7 @@ sd() {
 			-d 5 \
 			--search-path=$HOME/dotfiles \
 			--search-path=$HOME/dev \
+			--search-path=$HOME/work \
 			--search-path=$HOME/hda | \
 		fzf \
 			--reverse \

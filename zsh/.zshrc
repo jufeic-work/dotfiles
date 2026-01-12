@@ -28,7 +28,7 @@ if [[ $TERM_PROGRAM == "tmux" ]]; then
 fi
 # old: solarized
 export BAT_THEME="TwoDark"
-export RG_DIRS="$HOME/dotfiles $HOME/hda $HOME/dev"
+export RG_DIRS="$HOME/dotfiles $HOME/hda $HOME/dev $HOME/work"
 # use nvim as the pager for the 'man' command instead of less
 # q works to exit like in less
 export MANPAGER='nvim +Man!'

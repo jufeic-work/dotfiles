@@ -74,13 +74,14 @@ source $ZSH/themes/jjcol.zsh-theme
 # Preferred editor for local and remote sessions
 export EDITOR='nvim'
 
-# aliases
+# !alias
 alias v=nvim
+alias vi=nvim
+alias vim=nvim
 alias k=kubectl
 alias docker=podman
 alias lg=lazygit
-alias vi=nvim
-alias vim=nvim
+alias week='date +%V'
 # probably the --color only on Linux?
 alias ll='ls -lAhFG --color'
 alias rm='rm -I'
@@ -96,6 +97,8 @@ alias .....='cd ../../../..'
 podman() {
 	if [ "$1" = "run" ]; then
 		shift
+		# need to use the command utility so that the "podman" command is
+		# not interpreted as call to this function again -> recursive
 		command podman run --cidfile="$(pwd)"/.cid-"$(basename $(tmux display-message -p '#{pane_tty}'))" "$@"
 	else
 		command podman "$@"

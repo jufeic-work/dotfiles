@@ -1,17 +1,18 @@
 # Dotfiles
 ## Installation
 1. Select the correct branch for your platform on the GitHub page
+
 Supported platforms:
 - macOS
 - Linux
 - Windows (WSL)
 2. Run this shell command to install the dotfiles for your platform:
 ```bash
-/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/jufeic/dotfiles/refs/heads/main/install.sh)"
+/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/jufeic/dotfiles/refs/heads/wsl/install.sh)"
 ```
 3. Or run this shell command to install the dotfiles for all platforms:
 ```bash
-/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/jufeic/dotfiles/refs/heads/main/install.sh)" _ all
+/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/jufeic/dotfiles/refs/heads/wsl/install.sh)" _ all
 ```
 
 ## SSH configuration

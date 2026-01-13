@@ -12,7 +12,7 @@
 		# Optional. If provided, macOS is assumed as platform
 		# but all others are pulled too.
 
-DOTFILES_URL="https://github.com/jufeic/dotfiles.git"
+DOTFILES_URL="git@github.com:jufeic-work/dotfiles.git"
 
 cd "$HOME"
 if [[ ! -d "$HOME/dotfiles" ]]; then

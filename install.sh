@@ -46,7 +46,7 @@ if [ ! -f "$HOME/dotfiles/git/.gitconfig.local" ]; then
 	EOF
 fi
 
-brew bundle install --file="./brew/Brewfile"
+brew bundle install --file="$HOME/dotfiles/brew/Brewfile"
 
 # if zsh is not in the allowed shells, add it
 if ! grep -Fxq "$(brew --prefix)/bin/zsh" /etc/shells; then

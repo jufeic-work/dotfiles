@@ -53,7 +53,7 @@ if [ ! -f "$HOME/dotfiles/git/.gitconfig.local" ]; then
 	EOF
 fi
 
-brew bundle install --file="./brew/Brewfile"
+brew bundle install --file="$HOME/dotfiles/brew/Brewfile"
 
 if [[ $(uname) == "Linux" ]]; then
 	# in macos zsh is already preinstalled

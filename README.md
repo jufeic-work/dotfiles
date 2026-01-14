@@ -1,6 +1,7 @@
 # Dotfiles
 ## Installation
 1. Select the correct branch for your platform on the GitHub page
+
 Supported platforms:
 - macOS
 - Linux
